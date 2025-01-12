@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\mahasiswa;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
+use Session;
 
 class MahasiswaController extends Controller
 {
@@ -24,7 +26,7 @@ class MahasiswaController extends Controller
      */
     public function create()
     {
-        return view('mahasiswa.create');
+        return redirect()->to('mahasiswa')->with('success','success menambahkan data');
     }
 
     /**
@@ -35,13 +37,27 @@ class MahasiswaController extends Controller
      */
     public function store(Request $request)
     {
+        Session::flash('nim',$request->nim);
+        Session::flash('nama',$request->nama);
+        Session::flash('jurusan',$request->jurusan);
+        $request->validate([
+            'nim'=>'required|numeric|unique:mahasiswa,nim',
+            'nama'=>'required',
+            'jurusan'=>'required',
+        ],[
+            'nim.required'=>'nim wajib diisi',
+            'nim.numeric'=>'nim wajib wajib dalam angka',
+            'nim.unique'=>'nim yang diisikan sudah ada dalam data base',
+            'nama.required'=>'nama wajib diisi',
+            'jurusan.required'=>'jurusan wajib diisi',
+        ]);
         $data = [
             'nim'=>$request->nim,
             'nama'=>$request->nama,
             'jurusan'=>$request->jurusan,
         ];
         mahasiswa::create($data);
-        return 'hi';
+        return redirect()->to('mahasiswa')->with('success','success menambahkan data');
     }
 
     /**
